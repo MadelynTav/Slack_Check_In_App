@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Check-In-App</string>
+    <string name="service_name">Location Service</string>
+    <string name="action_settings">Settings</string>
+    <string name="press_to_start_service">Press To End Service</string>
+    <string name="press_to_end_service">Press To Start Service!</string>
+    <string name="receiver_class_name">Location Receiver</string>
+</resources>
