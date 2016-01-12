@@ -15,13 +15,13 @@ public class MainActivity extends Activity {
 
     }
 
-    public void startService(View v){
-            locationService = new Intent(this, LocationService.class);
-            startService(locationService);
+    public void startService(View v) {
+        locationService = new Intent(this, LocationService.class);
+        startService(locationService);
     }
 
-    private void endService(View v){
-        if (locationService!=null) {
+    public void endService(View v) {
+        if (locationService != null) {
             stopService(locationService);
         }
     }

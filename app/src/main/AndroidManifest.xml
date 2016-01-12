@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="nyc.apprentice.madelyntavarez.check_in_app">
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
@@ -25,12 +26,15 @@
 
         <service
             android:name=".LocationService"
-            android:label="@string/service_name">
-        </service>
+            android:label="@string/service_name"/>
 
-        <activity android:name=".LocationReceiver"
-            android:exported="true"/>
+        <receiver android:name=".LocationReceiver">
 
+            <intent-filter>
+                <action android:name="MyBroadcast" />
+            </intent-filter>
+
+        </receiver>
 
     </application>
 

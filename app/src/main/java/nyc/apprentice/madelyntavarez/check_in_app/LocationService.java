@@ -3,7 +3,6 @@ package nyc.apprentice.madelyntavarez.check_in_app;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
@@ -11,12 +10,15 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
+
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
+
+import java.util.Calendar;
 
 
 /**
@@ -28,6 +30,7 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
     private static final int MY_NOTIFICATION_ID = 1;
+    private int nextNotification;
 
     @Override
     public void onCreate() {
@@ -94,30 +97,48 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         float[] distance = new float[1];
         Location.distanceBetween(INTREPID_LAT_LNG.latitude, INTREPID_LAT_LNG.longitude, latitude, longitude, distance);
 
-        if (distance[0] < 50) {
+        Calendar calendar = Calendar.getInstance();
+        int seconds = calendar.get(Calendar.SECOND);
+            /*
+            //check if current time in milliseconds is greater than the next time we set
+            // for the launch of the notificion, if so, build the notification, will always be true
+            // the first time the app is launched
+            */
+        if (distance[0] < 50 && seconds >= nextNotification) {
             // Launch Persistent Notification
             buildNotification();
-            //TODO put notification to sleep until next day
         }
     }
 
     private void buildNotification() {
-
+        putNotificationToSleep();
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this);
         mBuilder.setSmallIcon(R.drawable.ic_check_24dp);
         mBuilder.setContentTitle("You have arrived to work, Click Me!");
         mBuilder.setContentText("I will alert your team members");
+        mBuilder.setAutoCancel(true);
 
         Intent intent = new Intent(this, LocationReceiver.class);
-        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
-        stackBuilder.addParentStack(LocationReceiver.class);
-        stackBuilder.addNextIntent(intent);
-        PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+        intent.setAction("MyBroadcast");
+        PendingIntent resultPendingIntent =
+                PendingIntent.getBroadcast(
+                        this,
+                        0,
+                        intent,
+                        PendingIntent.FLAG_UPDATE_CURRENT
+                );
         mBuilder.setContentIntent(resultPendingIntent);
         NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
         mNotificationManager.notify(MY_NOTIFICATION_ID, mBuilder.build());
 
+    }
 
+    //rest notification for 12 hours
+    private void putNotificationToSleep() {
+        Calendar calendar = Calendar.getInstance();
+        int seconds = calendar.get(Calendar.SECOND);
+
+        nextNotification = seconds + 43200000;
     }
 }
