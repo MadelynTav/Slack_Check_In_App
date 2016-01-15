@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="fifty">50</integer>
+    <integer name="zero">0</integer>
+    <integer name="twelve_hours_in_milliseconds">43200000</integer>
+    <integer name="requestCode">12345</integer>
+    <integer name="twenty_three">23</integer>
+</resources>

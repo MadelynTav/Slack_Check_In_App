@@ -5,4 +5,11 @@
     <string name="press_to_start_service">Press To End Service</string>
     <string name="press_to_end_service">Press To Start Service!</string>
     <string name="receiver_class_name">Location Receiver</string>
+    <string name="you_have_arrived_to_work_click_me">You have arrived to work, Click Me!</string>
+    <string name="i_will_alert_your_team_members">I will alert your team members</string>
+    <string name="my_broadcast">MyBroadcast</string>
+    <string name="text">text</string>
+    <string name="as_user">as_user</string>
+    <string name="rogers">Rogers</string>
+    <string name="inRogers">inRogers</string>
 </resources>

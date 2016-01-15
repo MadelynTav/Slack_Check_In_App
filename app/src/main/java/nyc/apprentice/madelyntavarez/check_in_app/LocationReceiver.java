@@ -17,12 +17,15 @@ import java.util.Map;
  * Receive Notification click and send message to slack channel
  */
 public class LocationReceiver extends BroadcastReceiver {
-    private static final String SEND_MESSAGE = "https://slack.com/api/chat.postMessage?token=xoxp-2215037996-17491994852-18213079808-ef35e598fb&channel=C064TT9KK&text";
+    PostToSlack postToSlack;
+    boolean inRogers;
 
     @Override
-    public void onReceive(Context context, Intent intent) {
+    public void onReceive(final Context context, Intent intent) {
+        postToSlack = new PostToSlack(context);
+        inRogers = intent.getBooleanExtra("inRogers", false);
 
-        StringRequest stringRequest = new StringRequest(StringRequest.Method.POST, SEND_MESSAGE, new Response.Listener<String>() {
+        StringRequest stringRequest = new StringRequest(StringRequest.Method.POST, PostToSlack.BASE_URL, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
 
@@ -37,12 +40,15 @@ public class LocationReceiver extends BroadcastReceiver {
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<>();
                 // the POST parameters:
-                params.put("text", "I'm Here");
-                params.put("as_user", "true");
+                if (inRogers) {
+                    params.put("text", postToSlack.getMessage() + " at Rogers");
+                } else {
+                    params.put("text", postToSlack.getMessage() + " at Third Street");
+                }
+                params.put("as_user", String.valueOf(postToSlack.isPostAsSelf()));
                 return params;
             }
         };
-
         Volley.newRequestQueue(context).add(stringRequest);
     }
 }

@@ -27,10 +27,12 @@ import java.util.Calendar;
 public class LocationService extends Service implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
     static final LatLng INTREPID_LAT_LNG = new LatLng(42.367010, -71.080210);
+    static final LatLng ROGERS_LAT_LNG = new LatLng(42.366456899999996, -71.0780707);
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
     private static final int MY_NOTIFICATION_ID = 1;
     private int nextNotification;
+    private boolean inRogers = false;
 
     @Override
     public void onCreate() {
@@ -51,7 +53,7 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         mLocationRequest = LocationRequest.create()
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
                 .setInterval(900 * 1000)        // 15 minutes, in milliseconds
-                .setFastestInterval(60 * 1000); // 1 minute, in milliseconds
+                .setFastestInterval(10 * 1000); // 1 minute, in milliseconds
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -59,7 +61,6 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
     @Override
     public IBinder onBind(Intent intent) {
         return null;
-
     }
 
     @Override
@@ -94,8 +95,10 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         double latitude = location.getLatitude();
         double longitude = location.getLongitude();
 
-        float[] distance = new float[1];
-        Location.distanceBetween(INTREPID_LAT_LNG.latitude, INTREPID_LAT_LNG.longitude, latitude, longitude, distance);
+        float[] distanceToThird = new float[1];
+        Location.distanceBetween(INTREPID_LAT_LNG.latitude, INTREPID_LAT_LNG.longitude, latitude, longitude, distanceToThird);
+        float[] distanceToRogers = new float[1];
+        Location.distanceBetween(ROGERS_LAT_LNG.latitude, ROGERS_LAT_LNG.longitude, latitude, longitude, distanceToRogers);
 
         Calendar calendar = Calendar.getInstance();
         int seconds = calendar.get(Calendar.SECOND);
@@ -104,8 +107,8 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
             // for the launch of the notificion, if so, build the notification, will always be true
             // the first time the app is launched
             */
-        if (distance[0] < 50 && seconds >= nextNotification) {
-            // Launch Persistent Notification
+        if ((distanceToThird[0] < R.integer.fifty || distanceToRogers[0] < 50) && seconds >= nextNotification) {
+            inRogers = true;
             buildNotification();
         }
     }
@@ -114,11 +117,12 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         putNotificationToSleep();
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this);
         mBuilder.setSmallIcon(R.drawable.ic_check_24dp);
-        mBuilder.setContentTitle("You have arrived to work, Click Me!");
+        mBuilder.setContentTitle("I have arrived at work, click me!");
         mBuilder.setContentText("I will alert your team members");
         mBuilder.setAutoCancel(true);
 
         Intent intent = new Intent(this, LocationReceiver.class);
+        intent.putExtra("inRogers", inRogers);
         intent.setAction("MyBroadcast");
         PendingIntent resultPendingIntent =
                 PendingIntent.getBroadcast(
