@@ -1,2 +1,3 @@
 # Slack_Check_In_App
-Alerts your office members when you are within 50m of the two offices
+An app that alerts your office members when you are within 50m of your offices
+
